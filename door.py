@@ -32,9 +32,9 @@ GPIO.setup(PORT_BUZZER_BUTTON_DOWNSTAIRS, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(PORT_BUZZER_BUTTON_UPSTAIRS, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(PORT_DOOR_BELL_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-def buzzer_button_pressed(channel):
-    print "button pressed"
+def button_pressed(channel):
+    print "button pressed", channel
     
-GPIO.add_event_detect(PORT_BUZZER_BUTTON_DOWNSTAIRS, GPIO.RISING, callback=my_callback, bouncetime=300)
-GPIO.add_event_detect(PORT_BUZZER_BUTTON_UPSTAIRS, GPIO.RISING, callback=my_callback, bouncetime=300)
-GPIO.add_event_detect(PORT_DOOR_BELL_BUTTON, GPIO.RISING, callback=my_callback, bouncetime=300)
+GPIO.add_event_detect(PORT_BUZZER_BUTTON_DOWNSTAIRS, GPIO.RISING, callback=button_pressed, bouncetime=300)
+GPIO.add_event_detect(PORT_BUZZER_BUTTON_UPSTAIRS, GPIO.RISING, callback=button_pressed, bouncetime=300)
+GPIO.add_event_detect(PORT_DOOR_BELL_BUTTON, GPIO.RISING, callback=button_pressed, bouncetime=300)
