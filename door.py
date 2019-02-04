@@ -2,6 +2,9 @@ import RPi.GPIO as GPIO
 import time
 from threading import Thread
 from pad4pi import rpi_gpio
+import SimpleHTTPServer
+import SocketServer
+
 
 GPIO.setmode(GPIO.BCM)
 
@@ -43,7 +46,7 @@ def button_pressed(channel):
 def do_open_door():
     print "activating buzzer"
     GPIO.output(PORT_RELAY_GATE, 0)
-    time.sleep(5)
+    time.sleep(3)
     print "deactivating buzzer"
     GPIO.output(PORT_RELAY_GATE, 1)
 
@@ -122,9 +125,43 @@ def keypad_pressed(key):
 
 keypad.registerKeyPressHandler(keypad_pressed)
 
+PAGE = """
+<html>
+<head>
+<script>
+function openDoor() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", '/', true);
+
+  xhr.onreadystatechange = function() { // Call a function when the state changes.
+    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      // Request finished. Do processing here.
+    }
+  }
+  xhr.send();
+}
+</script>
+</head>
+<body>
+<button onclick="openDoor()">Open da door</button>
+</body>
+"""
+class MyRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        global PAGE
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(PAGE)
+    def do_POST(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write("door buzzing!")
+        open_door()
+
+
+server = SocketServer.TCPServer(('0.0.0.0', 8080), MyRequestHandler)
 
 try:
-    while True:
-        time.sleep(1)
+    server.serve_forever()
 finally:
     keypad.cleanup()
