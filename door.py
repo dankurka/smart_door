@@ -5,10 +5,10 @@ from pad4pi import rpi_gpio
 
 GPIO.setmode(GPIO.BCM)
 
-PORT_RELAY_GATE = 21
-PORT_RELAY_UNUSED_1 = 20
-PORT_RELAY_UNUSED_2 = 19
-PORT_RELAY_UNUSED_3 = 26
+PORT_RELAY_GATE = 19
+PORT_RELAY_UNUSED_1 = 26
+PORT_RELAY_UNUSED_2 = 20
+PORT_RELAY_UNUSED_3 = 21
 
 PORT_KEYPAD_COLUMN1 = 15
 PORT_KEYPAD_COLUMN2 = 14
@@ -58,10 +58,10 @@ GPIO.add_event_detect(PORT_DOOR_BELL_BUTTON, GPIO.FALLING, callback=button_press
 
 
 KEYPAD = [
-    [1,2,3],
-    [4,5,6],
-    [7,8,9],
-    ["*",0,"#"]
+    ['1','2','3'],
+    ['4','5','6'],
+    ['7','8','9'],
+    ['*','0','#']
 ]
 
 ROW_PINS = [PORT_KEYPAD_ROW1,PORT_KEYPAD_ROW2,PORT_KEYPAD_ROW3,PORT_KEYPAD_ROW4] # BCM numbering
@@ -71,15 +71,50 @@ factory = rpi_gpio.KeypadFactory()
 
 keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PINS, key_delay=150)
 
+
+def read_door_code():
+    f = open('door_code.txt', 'r')
+    lines = f.read().splitlines()
+    if len(lines) != 1:
+        raise ValueError('door code text file has too many lines.')
+    door_code = lines[0].split(',')
+    if len(door_code) != 4:
+        raise ValueError('door code needs to be length 4')
+    # todo validate
+    return door_code
+
 keys_pushed = []
-door_code = [1,2,3,4]
+door_code = read_door_code()
+time_left = 5
+
+
+
+
+def timer_thread():
+    global time_left
+    global keys_pushed
+
+    while True:
+        if time_left == 0:
+            if len(keys_pushed) > 0:
+                keys_pushed = []
+                print "Reseted input"
+        if time_left > 0:
+            time_left = time_left - 1
+        time.sleep(1)
+        
+timer = Thread(target = timer_thread)
+timer.daemon = True
+timer.start()
 
 def keypad_pressed(key):
     print key
     global keys_pushed
     global door_code
+    global time_left
     keys_pushed.append(key)
 
+    time_left = 5
     if keys_pushed == door_code:
         open_door()
     if len(keys_pushed) >= 4:
