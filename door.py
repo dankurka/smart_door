@@ -38,17 +38,25 @@ GPIO.setup(PORT_BUZZER_BUTTON_DOWNSTAIRS, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PORT_BUZZER_BUTTON_UPSTAIRS, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(PORT_DOOR_BELL_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+door_buzzing = False
+
 def button_pressed(channel):
     print "button pressed", channel
     if channel in [PORT_BUZZER_BUTTON_DOWNSTAIRS, PORT_BUZZER_BUTTON_UPSTAIRS]:
         open_door()
 
 def do_open_door():
+    global door_buzzing
+    if door_buzzing:
+        return
+    door_buzzing = True
     print "activating buzzer"
     GPIO.output(PORT_RELAY_GATE, 0)
     time.sleep(3)
     print "deactivating buzzer"
     GPIO.output(PORT_RELAY_GATE, 1)
+    time.sleep(0.2)
+    door_buzzing = False
 
 def open_door():
     thread = Thread(target = do_open_door)
