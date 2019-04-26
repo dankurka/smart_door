@@ -9,8 +9,8 @@ import SocketServer
 GPIO.setmode(GPIO.BCM)
 
 PORT_RELAY_GATE = 19
-PORT_RELAY_UNUSED_1 = 26
-PORT_RELAY_UNUSED_2 = 20
+PORT_RELAY_DOOR = 20
+PORT_RELAY_UNUSED_2 = 26
 PORT_RELAY_UNUSED_3 = 21
 
 PORT_KEYPAD_COLUMN1 = 15
@@ -28,7 +28,7 @@ PORT_DOOR_BELL_BUTTON = 13
 
 # set relays as output
 GPIO.setup(PORT_RELAY_GATE, GPIO.OUT, initial=1)
-GPIO.setup(PORT_RELAY_UNUSED_1, GPIO.OUT, initial=1)
+GPIO.setup(PORT_RELAY_DOOR, GPIO.OUT, initial=1)
 GPIO.setup(PORT_RELAY_UNUSED_2, GPIO.OUT, initial=1)
 GPIO.setup(PORT_RELAY_UNUSED_3, GPIO.OUT, initial=1)
 
@@ -52,9 +52,11 @@ def do_open_door():
     door_buzzing = True
     print "activating buzzer"
     GPIO.output(PORT_RELAY_GATE, 0)
+    #GPIO.output(PORT_RELAY_DOOR, 0)
     time.sleep(3)
     print "deactivating buzzer"
     GPIO.output(PORT_RELAY_GATE, 1)
+    #GPIO.output(PORT_RELAY_DOOR, 1)
     time.sleep(0.2)
     door_buzzing = False
 
@@ -136,6 +138,7 @@ keypad.registerKeyPressHandler(keypad_pressed)
 PAGE = """
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <script>
 function openDoor() {
   const xhr = new XMLHttpRequest();
