@@ -3,15 +3,21 @@
 <head>
   <link rel="stylesheet" href="main.css">
   <script src="main.js" async></script>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Weather PWA">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   
-  <title>Title of the document</title>
+  <title>Door</title>
 </head>
 <body>
   <div id="opendoor_div" class="hidden">
     <button id="opendoor_button" type="button" name="button">open door</button>
   </div>
   <div id="login_div" class="hidden">
+	<span>Username:</span>
     <input id="username" type="text" name=""/>
+	<span>Password:</span>
     <input id="password" type="password" name=""/>
     <button id="login_button" type="button" name="button">log in</button>
   </div>

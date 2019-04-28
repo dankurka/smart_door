@@ -70,3 +70,8 @@ clearButton.addEventListener('click', () => {
   openDoorDiv.classList.add('hidden');
   loginDiv.classList.remove('hidden');
 });
+
+// IOS 10+ hack to diable view port zooming
+document.addEventListener('gesturestart', function (e) {
+    e.preventDefault();
+});
