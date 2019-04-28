@@ -6,7 +6,6 @@ const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const clearButton = document.getElementById('clear_button');
 
-
 if (localStorage.getItem('username')) {
   openDoorDiv.classList.remove('hidden');
 } else {
@@ -14,18 +13,55 @@ if (localStorage.getItem('username')) {
 }
 
 openDoorButton.addEventListener('click', () => {
+  const encodedUsername = localStorage.getItem('username');
+  const encodedPassword = localStorage.getItem('password');
 
+  openDoorDiv.classList.add('hidden');
+
+  const xhr = new XMLHttpRequest();
+  xhr.open(
+      "POST",
+      `/open_door?username=${encodedUsername}&password=${encodedPassword}`);
+
+  xhr.onreadystatechange = () => {
+    if (this.readyState === XMLHttpRequest.DONE) {
+      openDoorDiv.classList.remove('hidden');
+      if (this.status !== 200) {
+        alert(`Could not login: ${this.status}. Text: ${this.responseText}`);
+      }
+    }
+  }
+  xhr.send();
 });
 
 loginButton.addEventListener('click', () => {
   const username = usernameInput.value;
   const password = passwordInput.value;
-  usernameInput.value = '';
   passwordInput.value = '';
-  localStorage.setItem('username', username);
-  localStorage.setItem('password', password);
-  openDoorDiv.classList.remove('hidden');
+
+  const encodedUsername = encodeURIComponent(username);
+  const encodedPassword = encodeURIComponent(password);
+
   loginDiv.classList.add('hidden');
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST",
+           `/login?username=${encodedUsername}&password=${encodedPassword}`);
+
+  xhr.onreadystatechange = () => {
+    if (this.readyState === XMLHttpRequest.DONE) {
+      if (this.status === 200) {
+        localStorage.setItem('username', encodedUsername);
+        localStorage.setItem('password', encodedPassword);
+        openDoorDiv.classList.remove('hidden');
+      } else {
+        alert(`Could not login: ${this.status}. Text: ${this.responseText}`);
+        loginDiv.classList.remove('hidden');
+      }
+    }
+  }
+  
+  xhr.send();
 });
 
 clearButton.addEventListener('click', () => {
