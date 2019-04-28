@@ -23,7 +23,7 @@ openDoorButton.addEventListener('click', () => {
       "POST",
       `/open_door?username=${encodedUsername}&password=${encodedPassword}`);
 
-  xhr.onreadystatechange = () => {
+  xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE) {
       openDoorDiv.classList.remove('hidden');
       if (this.status !== 200) {
@@ -48,7 +48,7 @@ loginButton.addEventListener('click', () => {
   xhr.open("POST",
            `/login?username=${encodedUsername}&password=${encodedPassword}`);
 
-  xhr.onreadystatechange = () => {
+  xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE) {
       if (this.status === 200) {
         localStorage.setItem('username', encodedUsername);
