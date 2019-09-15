@@ -42,25 +42,27 @@ door_buzzing = False
 def button_pressed(channel):
     print "button pressed", channel
     if channel in [PORT_BUZZER_BUTTON_DOWNSTAIRS, PORT_BUZZER_BUTTON_UPSTAIRS]:
-        open_door()
+        open_door(True)
 
-def do_open_door():
+def do_open_door(open_both):
+    print "both", open_both
     global door_buzzing
     if door_buzzing:
         return
     door_buzzing = True
     print "activating buzzer"
     GPIO.output(PORT_RELAY_GATE, 0)
-    #GPIO.output(PORT_RELAY_DOOR, 0)
-    time.sleep(3)
+    if open_both:
+        GPIO.output(PORT_RELAY_DOOR, 0)
+    time.sleep(5)
     print "deactivating buzzer"
     GPIO.output(PORT_RELAY_GATE, 1)
-    #GPIO.output(PORT_RELAY_DOOR, 1)
+    GPIO.output(PORT_RELAY_DOOR, 1)
     time.sleep(0.2)
     door_buzzing = False
 
-def open_door():
-    thread = Thread(target = do_open_door)
+def open_door(open_both = False):
+    thread = Thread(target = do_open_door, args = (open_both,))
     thread.start()
 
 
@@ -87,18 +89,20 @@ keypad = factory.create_keypad(keypad=KEYPAD, row_pins=ROW_PINS, col_pins=COL_PI
 def read_door_code():
     f = open('door_code.txt', 'r')
     lines = f.read().splitlines()
-    if len(lines) != 1:
-        raise ValueError('door code text file has too many lines.')
-    door_code = lines[0].split(',')
-    if len(door_code) != 4:
-        raise ValueError('door code needs to be length 4')
+    if len(lines) != 2:
+        raise ValueError('door code text file has wrong line count.')
+    delivery_code = lines[0].split(',')
+    main_code = lines[1].split(',')
+    if len(delivery_code) != 4:
+        raise ValueError('delivery code needs to be length 4')
+    if len(main_code) != 4:
+        raise ValueError('main code needs to be length 4')
     # todo validate
-    return door_code
+    return delivery_code,main_code
 
 keys_pushed = []
-door_code = read_door_code()
+door_codes = read_door_code()
 time_left = 5
-
 
 
 
@@ -127,8 +131,10 @@ def keypad_pressed(key):
     keys_pushed.append(key)
 
     time_left = 5
-    if keys_pushed == door_code:
+    if keys_pushed == door_codes[0]:
         open_door()
+    if keys_pushed == door_codes[1]:
+        open_door(True)
     if len(keys_pushed) >= 4:
         keys_pushed = []
 
