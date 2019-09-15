@@ -31,7 +31,8 @@ class HTTPHandler(SimpleHTTPRequestHandler):
         username = parsed_query['username'][0]
         password = parsed_query['password'][0]
         if parsed_path.path == '/open_door':
-            self.handle_open_door(username, password)
+            both = parsed_query['both'][0] == 'true'
+            self.handle_open_door(username, password, both)
         elif parsed_path.path == '/login':
             self.handle_login(username, password)
         else:
@@ -48,7 +49,7 @@ class HTTPHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write("Valid login.")
        
-    def handle_open_door(self, username, password):
+    def handle_open_door(self, username, password, both):
          if not verifyUser(username, password):
              self.send_response(400)
              self.end_headers()
@@ -57,7 +58,7 @@ class HTTPHandler(SimpleHTTPRequestHandler):
          self.send_response(200)
          self.end_headers()
          self.wfile.write("Opening door.")
-         self.server.openDoorFunction()
+         self.server.openDoorFunction(both)
 
 
 class HTTPServer(BaseHTTPServer):

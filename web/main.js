@@ -1,5 +1,6 @@
-const openDoorButton = document.getElementById('opendoor_button');
-const openDoorDiv = document.getElementById('opendoor_div');
+const openDoorButton = document.getElementById('open_door_button');
+const openGateButton = document.getElementById('open_gate_button');
+const openDoorDiv = document.getElementById('open_door_div');
 const loginDiv = document.getElementById('login_div');
 const loginButton = document.getElementById('login_button');
 const usernameInput = document.getElementById('username');
@@ -12,7 +13,9 @@ if (localStorage.getItem('username')) {
   loginDiv.classList.remove('hidden');
 }
 
-openDoorButton.addEventListener('click', () => {
+
+function openDoor(both) {
+  
   const encodedUsername = localStorage.getItem('username');
   const encodedPassword = localStorage.getItem('password');
 
@@ -21,7 +24,7 @@ openDoorButton.addEventListener('click', () => {
   const xhr = new XMLHttpRequest();
   xhr.open(
       "POST",
-      `/open_door?username=${encodedUsername}&password=${encodedPassword}`);
+      `/open_door?username=${encodedUsername}&password=${encodedPassword}&both=${both}`);
 
   xhr.onreadystatechange = function() {
     if (this.readyState === XMLHttpRequest.DONE) {
@@ -32,6 +35,15 @@ openDoorButton.addEventListener('click', () => {
     }
   }
   xhr.send();
+}
+
+
+openDoorButton.addEventListener('click', () => {
+  openDoor(true);
+});
+
+openGateButton.addEventListener('click', () => {
+  openDoor(false);
 });
 
 loginButton.addEventListener('click', () => {
